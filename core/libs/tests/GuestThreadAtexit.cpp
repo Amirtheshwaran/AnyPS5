@@ -1,4 +1,5 @@
 #include "SceTypes.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
@@ -10,6 +11,7 @@ int APS5_VABI scePthreadJoin(Pthread thread, void** retval);
 Pthread APS5_VABI scePthreadSelf();
 int APS5_VABI _sceLibcInternalThreadAtexit_nid_postfix(void (APS5_VABI* destructor)(void*), void* object, void* dsoSymbol);
 void APS5_VABI _sceLibcInternalThreadDtors_nid_postfix();
+void* APS5_VABI memrchr_nid_postfix(const void* s, int c, std::size_t n);
 }
 
 namespace {
@@ -56,6 +58,21 @@ bool DestructorsThrow() {
 }
 
 int main() {
+    const char buffer[] = "banana";
+    Require(memrchr_nid_postfix(nullptr, 'a', 0) == nullptr);
+    Require(memrchr_nid_postfix(buffer, 'a', 0) == nullptr);
+    Require(memrchr_nid_postfix(buffer, 'a', 6) == buffer + 5);
+    Require(memrchr_nid_postfix(buffer, 'a', 5) == buffer + 3);
+    Require(memrchr_nid_postfix(buffer, 'b', 6) == buffer);
+    Require(memrchr_nid_postfix(buffer, 'z', 6) == nullptr);
+    const unsigned char binary[] = {0x00, 0x42, 0x00, 0x42, 0xFF};
+    Require(memrchr_nid_postfix(binary, 0x00, 5) == binary + 2);
+    Require(memrchr_nid_postfix(binary, 0x42, 5) == binary + 3);
+    Require(memrchr_nid_postfix(binary, 0x42, 3) == binary + 1);
+    Require(memrchr_nid_postfix(binary, 0xFF, 5) == binary + 4);
+    Require(memrchr_nid_postfix(binary, 0xFF, 4) == nullptr);
+    Require(memrchr_nid_postfix(binary, 0x142, 5) == binary + 3);
+    Require(memrchr_nid_postfix(binary, 0x200, 5) == binary + 2);
     const Pthread mainThread = scePthreadSelf();
     Require(Register(Record, 1) == 0);
     Require(Register(RecordAndRegister, 2) == 0);

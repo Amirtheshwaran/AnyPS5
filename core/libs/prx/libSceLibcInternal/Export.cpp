@@ -104,6 +104,16 @@ extern "C" {
 
 int Need_sceLibcInternal_nid_postfix = 1;
 
+void* APS5_VABI memrchr_nid_postfix(const void* s, int c, std::size_t n) {
+    if (n == 0) return nullptr;
+    const auto* p = static_cast<const unsigned char*>(s);
+    const unsigned char target = static_cast<unsigned char>(c);
+    for (std::size_t i = n; i > 0; --i) {
+        if (p[i - 1] == target) return const_cast<void*>(static_cast<const void*>(p + i - 1));
+    }
+    return nullptr;
+}
+
 void APS5_VABI __cxa_finalize_nid_postfix(void* dsoHandle) {
     CxaFinalize_nid_no_patch(dsoHandle);
 }
