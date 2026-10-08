@@ -79,7 +79,7 @@ def collect_real_names():
     return names
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Suggest real names for Unknown NID stubs")
     parser.add_argument("--db", default=os.environ.get("ANYPS5_NID_DB"),
@@ -88,7 +88,7 @@ def main():
                         help="resolve only these NIDs instead of scanning the tree")
     parser.add_argument("--json", action="store_true",
                         help="emit machine-readable JSON")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     db_path = Path(args.db) if args.db else DEFAULT_CACHE
     db = load_db(db_path)
